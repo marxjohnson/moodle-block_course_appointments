@@ -210,9 +210,9 @@ class block_course_appointments extends block_base {
                 }
             }
         }
-       // $SESSION->course_appointments = new stdClass();
+        $SESSION->course_appointments = array();
         if ($notify && !$notified) {
-         //   $SESSION->course_appointments['errors'][] = get_string('notnotified', 'block_course_appointments');
+            $SESSION->course_appointments['errors'][] = get_string('notnotified', 'block_course_appointments');
         }
     }
 
