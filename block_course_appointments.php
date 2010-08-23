@@ -1,4 +1,6 @@
 <?php
+require_once($CFG->libdir.'/sms/smslib.php');
+require_once($CFG->libdir.'/bennu/bennu.class.php');
 class block_course_appointments extends block_base {
 
     var $student;
@@ -7,11 +9,30 @@ class block_course_appointments extends block_base {
     function init() {
         $this->title = get_string('blockname', 'block_course_appointments');
         $this->version = 2010071900;
+        $this->cron = 3600;
     }
 
     function applicable_formats() {
         return array('course-view' => true,
                 'all' => false);
+    }
+
+    function cron() {
+        if (date('H') == '08') { // If it's between 8 and 9 AM
+            $appointments = get_records_select('event', 'uuid LIKE "%S%" AND timestart BETWEEN UNIX_TIMESTAMP(CURDATE()) AND UNIX_TIMESTAMP(CURDATE()+1)');
+            foreach ($appointments as $appointment) {
+                $student = get_record('user', 'id', $appointment->userid);
+                $teacher_appointment = get_record('event', 'uuid = '.str_replace('S', 'T', $appointment->uuid));
+                $teacher = get_record('user', 'id', $teacher_appointment->userid);
+                $a = new stdClass;
+                $a->name = fullname($teacher);
+                $a->time = date('H:i', $appointment->timestart);
+                $sms = SMS::Loader($CFG);
+                if ($sms->format_number($student->phone2)) {
+                    $sent = $sms->send_message(array($student->phone2), get_string('remindsms', 'block_course_appointments', $a));
+                }
+            }
+        }
     }
 
     function get_content() {
@@ -183,23 +204,28 @@ class block_course_appointments extends block_base {
         $names = new stdClass;
         $names->student = fullname($this->student);
         $names->teacher = fullname($USER);
+        $uuid = Bennu::generate_guid();
         $appointment = new stdClass;
         $appointment->name = get_string('entryname', 'block_course_appointments', $names->student);
         $appointment->description = get_string('entrydescription', 'block_course_appointments', $names);
         $appointment->userid = $USER->id;
         $appointment->timestart = $this->timestamp;
-        $appointment->uuid = 'course_appointments_'.time();
+
+        // To identify the two appointments as linked, we use the same UUID for both, but replace the
+        // dashes with T (for Teacher) and S (For student). Since neither character is Hexadecimal, they
+        // wont occur in any generated UUID.
+        $appointment->uuid = str_replace('-', 'T', $uuid);
         $appointment->format = 1;
         insert_record('event', $appointment);
         $appointment->name = get_string('entryname', 'block_course_appointments', $names->teacher);
         $appointment->userid = $this->student->id;
+        $appointment->uuid = str_replace('-', 'S', $uuid);
         insert_record('event', $appointment);
         $names->date = date('d/m/Y', $this->timestamp);
         $names->time = date('H:i', $this->timestamp);
         $notified = false;
         if ($notify) {            
-            //$notified = email_to_user($this->student, $USER, get_string('notifysubject', 'block_course_appointments', $names->teacher), get_string('notifytext', 'block_course_appointments', $names));
-            require_once($CFG->libdir.'/sms/smslib.php');
+            $notified = email_to_user($this->student, $USER, get_string('notifysubject', 'block_course_appointments', $names->teacher), get_string('notifytext', 'block_course_appointments', $names));
             $sms = SMS::Loader($CFG);
             if ($sms->format_number($this->student->phone2)) {
                 $sent = $sms->send_message(array($this->student->phone2), get_string('notifysms', 'block_course_appointments', $names));
