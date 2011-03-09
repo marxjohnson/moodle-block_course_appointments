@@ -1,5 +1,5 @@
 <?php
-$block_course_appointments_capabilities = array(
+$capabilities = array(
 
     'block/course_appointments:book' => array(
 

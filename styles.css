@@ -1,8 +1,3 @@
-<?php
-    require_once($CFG->dirroot.'/lib/yui/calendar/assets/skins/sam/calendar.css');
-    require_once($CFG->dirroot.'/lib/yui/container/assets/skins/sam/container.css');
-?>
-
 #calcontainer {
     font-size: 9pt;
 }

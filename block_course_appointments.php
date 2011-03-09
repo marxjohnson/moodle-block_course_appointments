@@ -8,8 +8,6 @@ class block_course_appointments extends block_base {
 
     function init() {
         $this->title = get_string('blockname', 'block_course_appointments');
-        $this->version = 2010071900;
-        $this->cron = 3600;
     }
 
     function applicable_formats() {
