@@ -1,119 +1,67 @@
-document.body.className += ' yui-skin-sam';
-YAHOO.util.Event.onDOMReady(function(){
 
-    var Event = YAHOO.util.Event,
-        Dom = YAHOO.util.Dom,
-        dialog,
-        calendar;
+M.block_course_appointments = {
+    
+    Y: {},
 
-    var listeners = new Array();
-    showBtn = Dom.get("show");
-    dateInput = Dom.get("appointment_date");
-    listeners.push(showBtn);
-    listeners.push(dateInput);
-
-    Event.on(listeners, "click", courseappointments_showcalendar);
-    Event.on(dateInput, "focus", courseappointments_showcalendar);
-
-    function courseappointments_showcalendar() {
-
-        // Lazy Dialog Creation - Wait to create the Dialog, and setup document click listeners, until the first time the button is clicked.
-        if (!dialog) {
-
-            // Hide Calendar if we click anywhere in the document other than the calendar
-            Event.on(document, "click", function(e) {
-                var el = Event.getTarget(e);
-                var dialogEl = dialog.element;
-                if (el != dialogEl && !Dom.isAncestor(dialogEl, el) && el != showBtn && !Dom.isAncestor(showBtn, el)&& el != dateInput && !Dom.isAncestor(dateInput, el)) {
-                    dialog.hide();
-                }
-            });
-
-            function resetHandler() {
-                // Reset the current calendar page to the select date, or
-                // to today if nothing is selected.
-                var selDates = calendar.getSelectedDates();
-                var resetDate;
-
-                if (selDates.length > 0) {
-                    resetDate = selDates[0];
-                } else {
-                    resetDate = calendar.today;
-                }
-
-                calendar.cfg.setProperty("pagedate", resetDate);
-                calendar.render();
-            }
-
-            function closeHandler() {
-                dialog.hide();
-            }
-
-            dialog = new YAHOO.widget.Dialog("calcontainer", {
-                visible:false,
-                context:["appointment_date", "tr", "bl"],
-                buttons:[ {text:"Reset", handler: resetHandler, isDefault:true}, {text:"Close", handler: closeHandler}],
-                draggable:false,
-                close:true
-            });
-            dialog.setHeader('Pick A Date');
-            dialog.setBody('<div id="cal"></div>');
-            dialog.render(document.body);
-
-            dialog.showEvent.subscribe(function() {
-                if (YAHOO.env.ua.ie) {
-                    // Since we're hiding the table using yui-overlay-hidden, we
-                    // want to let the dialog know that the content size has changed, when
-                    // shown
-                    dialog.fireEvent("changeContent");
-                }
-            });
-        }
-
-        // Lazy Calendar Creation - Wait to create the Calendar until the first time the button is clicked.
-        if (!calendar) {
+    cal: false,
+       
+    appointmentdate: {},
+    
+    init: function(Y) {
+        Y.one('body').addClass('yui-skin-sam');
+        this.show = Y.one('#block_courseappointments_show');
+        this.appointmentdate = Y.one('#block_courseappointments_appointmentdate');
+        Y.on('click', this.showcalendar, Array(this.show, this.appointmentdate));
+        Y.on('focus', this.showcalendar, this.appointmentdate);
+        this.Y = Y;
+    },
+    
+    showcalendar: function(e){
+        YUI().use('dd-drag', 'yui2-calendar', function(Y){
+            //This will make your YUI 2 code run unmodified
+            var YAHOO = Y.YUI2;
             var now = new Date();
-            var selected = new Date(dateInput.value);
-            calendar = new YAHOO.widget.Calendar("cal", {
-                iframe:false,          // Turn iframe off, since container has iframe support.
-                hide_blank_weeks:true,  // Enable, to demonstrate how we handle changing height, using changeContent
-                mindate: now,
-                selected: (selected.getMonth()+1)+'/'+selected.getDate()+'/'+selected.getFullYear()
-            });
-            calendar.render();
-
-            calendar.selectEvent.subscribe(function() {
-                if (calendar.getSelectedDates().length > 0) {
-
-                    var selDate = calendar.getSelectedDates()[0];
-
-                    // Pretty Date Output, using Calendar's Locale values: Friday, 8 February 2008                   
-                    var dStr = selDate.getDate();
-                    var mStr = calendar.cfg.getProperty("MONTHS_SHORT")[selDate.getMonth()];
-                    var yStr = selDate.getFullYear();
-
-                    Dom.get("appointment_date").value = dStr + " " + mStr + " " + yStr;
-                } else {
-                    Dom.get("appointment_date").value = "";
+            block = M.block_course_appointments;
+            var selected = new Date(block.appointmentdate.value);
+            if (!block.cal) {
+            
+                block.cal = new YAHOO.widget.Calendar('block_courseappointments_calendarcontainer', {
+                    iframe: false, // Turn iframe off, since container has iframe support.
+                    hide_blank_weeks: true, // Enable, to demonstrate how we handle changing height, using changeContent
+                    mindate: now,
+                    selected: (selected.getMonth() + 1) + '/' + selected.getDate() + '/' + selected.getFullYear()
+                });
+                block.cal.selectEvent.subscribe(function(){
+                    if (block.cal.getSelectedDates().length > 0) {
+                    
+                        var selDate = block.cal.getSelectedDates()[0];
+                        
+                        // Pretty Date Output, using Calendar's Loblock.cale values: Friday, 8 February 2008                   
+                        var dStr = selDate.getDate();
+                        var mStr = block.cal.cfg.getProperty("MONTHS_SHORT")[selDate.getMonth()];
+                        var yStr = selDate.getFullYear();
+                        block.appointmentdate.setAttribute('value', dStr + ' ' + mStr + ' ' + yStr);
+                    }
+                    else {
+                        block.appointmentdate.setAttribute('value', '');
+                    }
+                    block.cal.hide();
+                });
+                block.cal.renderEvent.subscribe(function(){
+                    var region = Y.one('.block_course_appointments').ancestor('.region-content');
+                    region.setStyle('height', parseInt(region.getStyle('height').replace('px', '')) + 185);
+                });
+                block.cal.render();
+            }
+            else {
+                block.cal.show();
+            }
+            Y.on('click', function(e){
+                if (e.target.ancestor('#block_courseappointments_calendarcontainer', true) == null &&
+                e.target.ancestor('#block_courseappointments_daterow', true) == null) {
+                    M.block_course_appointments.cal.hide();
                 }
-                dialog.hide();
-            });
-
-            calendar.renderEvent.subscribe(function() {
-                // Tell Dialog it's contents have changed, which allows
-                // container to redraw the underlay (for IE6/Safari2)
-                dialog.fireEvent("changeContent");
-            });
-        }
-
-        var seldate = calendar.getSelectedDates();
-
-        if (seldate.length > 0) {
-            // Set the pagedate to show the selected date if it exists
-            calendar.cfg.setProperty("pagedate", seldate[0]);
-            calendar.render();
-        }
-
-        dialog.show();
+            }, document);
+        });
     }
-});
+}

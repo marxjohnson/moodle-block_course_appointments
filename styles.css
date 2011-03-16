@@ -1,5 +1,6 @@
-#calcontainer {
+#block_courseappointments_calendarcontainer {
     font-size: 9pt;
+    position: absolute;
 }
 
 .yui-skin-sam .yui-calcontainer .title {
@@ -20,7 +21,7 @@
 	background:url(../../lib/yui/assets/skins/sam/sprite.png) no-repeat 0 -500px;
 }
 
-#appointment_date {
+#block_courseappointments_appointmentdate {
     width: 50%;
 }
 
