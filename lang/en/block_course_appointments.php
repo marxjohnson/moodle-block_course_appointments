@@ -18,7 +18,7 @@
 /**
  * English Language Strings for course appointments block
  * 
- * @package block
+ * @package blocks
  * @subpackage course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2011 Tauntons College, UK

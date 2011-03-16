@@ -24,7 +24,7 @@
  * If any errors were generated during validation, processing is skipped and the errors
  * are stored in the session for display in the block.
  *
- * @package block
+ * @package blocks
  * @subpackage courseappointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2010 Tauntons College, UK

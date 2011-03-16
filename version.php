@@ -20,7 +20,7 @@
  *
  * Defines the block's version and cron interval
  * 
- * @package block
+ * @package blocks
  * @subpackage courseappointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2010 Tauntons College, UK

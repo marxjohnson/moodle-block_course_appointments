@@ -18,7 +18,7 @@
 /**
  * Defines class for course appointments block
  *
- * @package block
+ * @package blocks
  * @subpackage course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2010 Tauntons College, UK
