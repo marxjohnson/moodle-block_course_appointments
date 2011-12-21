@@ -28,4 +28,8 @@
  */ 
  
 $plugin->version = 2011030900;
-$plugin->cron = 3600;
+$plugin->cron = 3600;$plugin->cron = 3600;
+$plugin->requires = 2010112400;
+$plugin->component = 'block_course_appointments';
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '2.0 (Build: 2011030900)';
