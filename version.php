@@ -1,4 +1,4 @@
-<?php 
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -19,16 +19,15 @@
  * Standard plugin version file
  *
  * Defines the block's version and cron interval
- * 
- * @package blocks
- * @subpackage courseappointments
+ *
+ * @package block_course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2010 Tauntons College, UK
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ 
- 
+ */
+
 $plugin->version = 2011030900;
-$plugin->cron = 3600;$plugin->cron = 3600;
+$plugin->cron = 3600;
 $plugin->requires = 2010112400;
 $plugin->component = 'block_course_appointments';
 $plugin->maturity = MATURITY_STABLE;

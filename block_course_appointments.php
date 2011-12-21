@@ -18,8 +18,7 @@
 /**
  * Defines class for course appointments block
  *
- * @package blocks
- * @subpackage course_appointments
+ * @package block_course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2010 Tauntons College, UK
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,18 +40,18 @@ class block_course_appointments extends block_base {
      *
      * @var object
      */
-    var $student;
+    public $student;
     /**
      * Stores the event start timestamp during validation and processing
      *
      * @var object
      */
-    var $timestamp;
+    public $timestamp;
 
     /**
      * Standard block init method, defines the title
      */
-    function init() {
+    public function init() {
         $this->title = get_string('pluginname', 'block_course_appointments');
     }
 
@@ -62,7 +61,7 @@ class block_course_appointments extends block_base {
      * @see blocks/block_base#applicable_formats()
      * @return array
      */
-    function applicable_formats() {
+    public function applicable_formats() {
         return array('course-view' => true,
                 'all' => false);
     }
@@ -70,10 +69,10 @@ class block_course_appointments extends block_base {
      * Prevent multiple instances of the block on a page
      * @return boolean
      */
-    function allow_multiple() {
+    public function allow_multiple() {
         return false;
     }
-     
+
     /**
      * Cron job, sends reminder texts once a day
      *
@@ -81,21 +80,24 @@ class block_course_appointments extends block_base {
      * once a day).  Looks for any appoinments happening today, and if there's a valid mobile
      * number for the student, sends them a reminder via SMS.
      */
-    function cron() {
+    public function cron() {
         global $DB;
         if (date('H') == '08') { // If it's between 8 and 9 AM
             $params = array("%S%", strtotime('today'), strtotime('tomorrow'));
-            $appointments = $DB->get_records_select('event', 'uuid LIKE ? AND timestart BETWEEN ? AND ?', $params);
+            $where = 'uuid LIKE ? AND timestart BETWEEN ? AND ?';
+            $appointments = $DB->get_records_select('event', $where, $params);
             foreach ($appointments as $appointment) {
                 $student = get_record('user', 'id', $appointment->userid);
-                $teacher_appointment = get_record('event', 'uuid = '.str_replace('S', 'T', $appointment->uuid));
+                $teacheruuid = str_replace('S', 'T', $appointment->uuid);
+                $teacher_appointment = get_record('event', 'uuid = '.$teacheruuid);
                 $teacher = get_record('user', 'id', $teacher_appointment->userid);
                 $a = new stdClass;
                 $a->name = fullname($teacher);
                 $a->time = date('H:i', $appointment->timestart);
                 $sms = SMS::Loader($CFG);
                 if ($sms->format_number($student->phone2)) {
-                    $sent = $sms->send_message(array($student->phone2), get_string('remindsms', 'block_course_appointments', $a));
+                    $reminder = get_string('remindsms', 'block_course_appointments', $a);
+                    $sent = $sms->send_message(array($student->phone2), $reminder);
                 }
             }
         }
@@ -110,9 +112,9 @@ class block_course_appointments extends block_base {
      *
      * @see blocks/block_base#get_content()
      */
-    function get_content() {
+    public function get_content() {
         global $CFG, $COURSE, $SESSION, $DB;
-        if ($this->content !== NULL) {
+        if ($this->content !== null) {
             return $this->content;
         }
         $this->content->text = '';
@@ -133,7 +135,10 @@ class block_course_appointments extends block_base {
             'requires'  =>  array('base', 'node')
         );
 
-        $this->page->requires->js_init_call('M.block_course_appointments.init', array(), false, $jsmodule);
+        $this->page->requires->js_init_call('M.block_course_appointments.init',
+                                            array(),
+                                            false,
+                                            $jsmodule);
         return $this->content;
     }
 
@@ -147,14 +152,14 @@ class block_course_appointments extends block_base {
      * @param $coursecontext Context object for the course we can get current users.
      * @return string HTML for the form.
      */
-    function build_form($coursecontext) {
+    public function build_form($coursecontext) {
         global $CFG, $COURSE, $SESSION, $DB, $OUTPUT;
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         $studentassignments = get_users_from_role_on_context($studentrole, $coursecontext);
         $url = new moodle_url('/blocks/course_appointments/process.php');
         $studentlist = array();
 
-        foreach($studentassignments as $studentassignment) {
+        foreach ($studentassignments as $studentassignment) {
             $studentrecord = $DB->get_record('user', array('id' => $studentassignment->userid));
             $studentlist[$studentrecord->id] = fullname($studentrecord);
         }
@@ -189,58 +194,109 @@ class block_course_appointments extends block_base {
         } else {
             $selected_time['minutes'] = date('i');
         }
-        if (isset($SESSION->course_appointments['appointment_notify']) && $SESSION->course_appointments['appointment_notify'] == 1) {
+        if (isset($SESSION->course_appointments['appointment_notify'])
+            && $SESSION->course_appointments['appointment_notify'] == 1) {
             $checked = 'checked';
         }
 
-        $form = html_writer::start_tag('form', array('id' => "block_courseappointments_form", 'action' => $url, 'method' => "post"));
-        $form .= html_writer::empty_tag('input', array('type' => "hidden", 'name' => "courseid", 'value' => $COURSE->id));
+        $formattrs = array(
+            'id' => "block_courseappointments_form",
+            'action' => $url,
+            'method' => "post"
+        );
+        $form = html_writer::start_tag('form', $formattrs);
+        $inputattrs = array(
+            'type' => "hidden",
+            'name' => "courseid",
+            'value' => $COURSE->id
+        );
+        $form .= html_writer::empty_tag('input', $inputattrs);
         $form .= html_writer::start_tag('div', array('class' => "formrow"));
-        $form .= html_writer::tag('label', $studentrole->name, array('for' => "appointment_student"));
+        $labelattrs = array('for' => "appointment_student");
+        $form .= html_writer::tag('label', $studentrole->name, $labelattrs);
         $form .= html_writer::select($studentlist, 'appointment_student', $selected_student);
         $form .= html_writer::end_tag('div');
 
-        $form .= html_writer::start_tag('div', array('class' => "formrow", 'id' => "block_courseappointments_daterow"));
+        $rowattrs = array('class' => "formrow", 'id' => "block_courseappointments_daterow");
+        $form .= html_writer::start_tag('div', $rowattrs);
         $form .= html_writer::tag('label', get_string('date'), array('for' => "date"));
-        $form .= html_writer::empty_tag('input', array('type' => "text", 'id' => "block_courseappointments_appointmentdate", 'name' => "appointment_date", 'value' => $selected_date));
-        $form .= html_writer::start_tag('button', array('type' => "button", 'id' => "block_courseappointments_show", 'title' => "Show Calendar"));
-        $form .= html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/calendar'), 'alt' => "Calendar"));
+        $inputattrs = array(
+            'type' => "text",
+            'id' => "block_courseappointments_appointmentdate",
+            'name' => "appointment_date",
+            'value' => $selected_date
+        );
+        $form .= html_writer::empty_tag('input', $inputattrs);
+        $buttonattrs = array(
+            'type' => "button",
+            'id' => "block_courseappointments_show",
+            'title' => "Show Calendar"
+        );
+        $form .= html_writer::start_tag('button', $buttonattrs);
+        $imgattrs = array(
+            'src' => $OUTPUT->pix_url('i/calendar'),
+            'alt' => "Calendar"
+        );
+        $form .= html_writer::empty_tag('img', $imgattrs);
         $form .= html_writer::end_tag('button');
         $form .= html_writer::end_tag('div');
 
-        $form .= html_writer::tag('div', '', array('id' => "block_courseappointments_calendarcontainer"));
+        $divattrs = array('id' => "block_courseappointments_calendarcontainer");
+        $form .= html_writer::tag('div', '', $divattrs);
 
         $form .= html_writer::start_tag('div', array('class' => "formrow"));
-        $form .= html_writer::tag('label', get_string('time'), array('for' => "appointment_time_hours"));
-        $form .= html_writer::select($hours, 'appointment_time_hours', $selected_time['hours'], array());
+        $form .= html_writer::tag('label',
+                                  get_string('time'),
+                                  array('for' => "appointment_time_hours"));
+        $form .= html_writer::select($hours,
+                                     'appointment_time_hours',
+                                     $selected_time['hours'],
+                                     array());
         $form .= ':';
-       	$form .= html_writer::select($minutes, 'appointment_time_minutes', $selected_time['minutes'], array());
-       	$form .= html_writer::end_tag('div');
-
-        $form .= html_writer::start_tag('div', array('class' => "formrow"));
-        $form .= html_writer::tag('label', get_string('notifystudent', 'block_course_appointments'), array('for' => "appointment_notify"));
-        $form .= html_writer::empty_tag('input', array('type' => "hidden", 'name' => "appointment_notify", 'value' => "0"));
-        $form .= html_writer::empty_tag('input', array('type' => "checkbox", 'name' => "appointment_notify", 'value' => "1", 'checked' => $checked));
+        $form .= html_writer::select($minutes,
+                                     'appointment_time_minutes',
+                                     $selected_time['minutes'],
+                                     array());
         $form .= html_writer::end_tag('div');
 
-        $form .= html_writer::empty_tag('input', array('type' => "submit", 'name' => "appointment_submit", 'value' => get_string('book', 'block_course_appointments')));
+        $form .= html_writer::start_tag('div', array('class' => "formrow"));
+        $form .= html_writer::tag('label',
+                                  get_string('notifystudent', 'block_course_appointments'),
+                                  array('for' => "appointment_notify"));
+        $inputattrs = array('type' => "hidden", 'name' => "appointment_notify", 'value' => "0");
+        $form .= html_writer::empty_tag('input', $inputattrs);
+        $inputattrs = array(
+            'type' => "checkbox",
+            'name' => "appointment_notify",
+            'value' => "1",
+            'checked' => $checked
+        );
+        $form .= html_writer::empty_tag('input', $inputattrs);
+        $form .= html_writer::end_tag('div');
+
+        $submitattrs = array(
+            'type' => "submit",
+            'name' => "appointment_submit",
+            'value' => get_string('book', 'block_course_appointments')
+        );
+        $form .= html_writer::empty_tag('input', $submitattrs);
         $form .= html_writer::end_tag('form');
         return $form;
     }
-    
+
     /**
      * Reads in POSTed data from the form, validates it and stores it for processing
-     * 
+     *
      * Reads studentid, date and time from the form, checks that the student exists,
      * converst the date and time to unix time, and checks that it's valid and not in the past.
      * Returns an error message for each error encountered, or false otherwise.
      * Validated data is stored in {@see $student} and {@see $timestamp} for
      * easy access by {@see process_form()}.
      * Raw data is stored in the user's session in case it needs redisplaying on the form.
-     * 
+     *
      * @return array|bool	Array of error messages, or false if none.
      */
-    function validate_form() {
+    public function validate_form() {
         global $SESSION, $DB;
         $studentid = optional_param('appointment_student', 0, PARAM_INT);
         $SESSION->course_appointments['appointment_student'] = $studentid;
@@ -256,7 +312,7 @@ class block_course_appointments extends block_base {
         if (empty($studentid)) {
             $errors[] = get_string('nostudent', 'block_course_appointments');
         } else {
-            if(!$this->student = $DB->get_record('user', array('id' => $studentid))) {
+            if (!$this->student = $DB->get_record('user', array('id' => $studentid))) {
                 $errors[] = get_string('studentdoesntexist', 'block_course_appointments');
             }
         }
@@ -277,19 +333,19 @@ class block_course_appointments extends block_base {
             return $errors;
         }
     }
-    
+
     /**
      * Processes the validated data and inserts appointments into the database.
-     * 
+     *
      * Takes the validated student record and appointment timestamp from the object's properties.
      * Generates an unique UUID, and edits it so it can be used to identify the two appointmetns
      * as linked, and inserts a user event into the database for both the student and the teacher
      * (current user).  Then clears the session data for the block so the data isn't redisplayed
-     * in the form.	
+     * in the form.
      * If the notify checkbox was ticked, an email and SMS wil also be sent to the student.
-     * 
+     *
      */
-    function process_form() {
+    public function process_form() {
         global $USER, $COURSE, $CFG, $SESSION, $DB;
         global $sms;
         $notify = optional_param('appointment_notify', 0, PARAM_INT);
@@ -299,13 +355,15 @@ class block_course_appointments extends block_base {
         $uuid = Bennu::generate_guid();
         $appointment = new stdClass;
         $appointment->name = get_string('entryname', 'block_course_appointments', $names->student);
-        $appointment->description = get_string('entrydescription', 'block_course_appointments', $names);
+        $appointment->description = get_string('entrydescription',
+                                               'block_course_appointments',
+                                               $names);
         $appointment->userid = $USER->id;
         $appointment->timestart = $this->timestamp;
 
-        // To identify the two appointments as linked, we use the same UUID for both, but replace the
-        // dashes with T (for Teacher) and S (For student). Since neither character is Hexadecimal, they
-        // wont occur in any generated UUID.
+        // To identify the two appointments as linked, we use the same UUID for both, but replace
+        // the dashes with T (for Teacher) and S (For student). Since neither character is
+        // Hexadecimal, they wont occur in any generated UUID.
         $appointment->uuid = str_replace('-', 'T', $uuid);
         $appointment->format = 1;
         $DB->insert_record('event', $appointment);
@@ -317,12 +375,16 @@ class block_course_appointments extends block_base {
         $names->time = date('H:i', $this->timestamp);
         $notified = false;
         if ($notify) {
-            $notified = email_to_user($this->student, $USER, get_string('notifysubject', 'block_course_appointments', $names->teacher), get_string('notifytext', 'block_course_appointments', $names));
+            $subject = get_string('notifysubject', 'block_course_appointments', $names->teacher);
+            $message = get_string('notifytext', 'block_course_appointments', $names);
+            $notified = email_to_user($this->student, $USER, $subject, $message);
             $sms = SMS::Loader($CFG);
             if ($sms->format_number($this->student->phone2)) {
-                $sent = $sms->send_message(array($this->student->phone2), get_string('notifysms', 'block_course_appointments', $names));
-                foreach($sent->responses as $response) { // Create a list of users to whom the message failed to send
-                    if($response->code == 1) {
+                $message = get_string('notifysms', 'block_course_appointments', $names);
+                $sent = $sms->send_message(array($this->student->phone2), $message);
+                // Create a list of users to whom the message failed to send
+                foreach ($sent->responses as $response) {
+                    if ($response->code == 1) {
                         $notified = true;
                     }
                 }
@@ -330,16 +392,17 @@ class block_course_appointments extends block_base {
         }
         $SESSION->course_appointments = array();
         if ($notify && !$notified) {
-            $SESSION->course_appointments['errors'][] = get_string('notnotified', 'block_course_appointments');
+            $SESSION->course_appointments['errors'][] = get_string('notnotified',
+                                                                   'block_course_appointments');
         }
     }
 
     /**
      * Formats the error messages as HTML.
-     * 
+     *
      * @param $errors error messages generated by {@see validate_form()}
      */
-    function display_errors($errors) {
+    public function display_errors($errors) {
         $this->content->text .= html_writer::start_tag('div', array('class' => "errors"));
         foreach ($errors as $error) {
             $this->content->text .= $error.html_writer::empty_tag('br');
@@ -347,4 +410,3 @@ class block_course_appointments extends block_base {
         $this->content->text .= html_writer::end_tag('div');
     }
 }
-?>

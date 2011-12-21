@@ -17,20 +17,19 @@
 
 /**
  * Processes the appointment form
- * 
+ *
  * This page recieves the form from the course appointments block, passess the data
  * to the validation method, and if all's well passess it on the the process method
  * for insertion into the database.  It then returns the user to the page displaying the block.
  * If any errors were generated during validation, processing is skipped and the errors
  * are stored in the session for display in the block.
  *
- * @package blocks
- * @subpackage courseappointments
+ * @package block_course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2010 Tauntons College, UK
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ 
- 
+ */
+
 require_once('../../config.php');
 require_login();
 $courseid = required_param('courseid', PARAM_INT);
@@ -41,12 +40,10 @@ $block = new block_course_appointments();
 $SESSION->course_appointments = array();
 
 if (isset($_POST['appointment_submit'])) {
-    if ($errors = $block->validate_form()) {        
+    if ($errors = $block->validate_form()) {
         $SESSION->course_appointments['errors'] = $errors;
     } else {
         $block->process_form();
     }
 }
 redirect($CFG->wwwroot.'/course/view.php?id='.$courseid, '', 0);
-
-?>

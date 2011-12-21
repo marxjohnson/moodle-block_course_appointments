@@ -17,21 +17,20 @@
 
 /**
  * Capabilities for course appointments block
- * 
- * @package blocks
- * @subpackage course_appointments
+ *
+ * @package blocks_course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2011 Tauntons College, UK
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ 
- 
+ */
+
 $capabilities = array(
 
     'block/course_appointments:book' => array(
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(           
+        'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'coursecreator' => CAP_ALLOW,
@@ -39,4 +38,3 @@ $capabilities = array(
         )
     )
 );
-?>

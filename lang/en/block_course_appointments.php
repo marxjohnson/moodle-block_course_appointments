@@ -17,14 +17,13 @@
 
 /**
  * English Language Strings for course appointments block
- * 
- * @package blocks
- * @subpackage course_appointments
+ *
+ * @package block_course_appointments
  * @author      Mark Johnson <mark.johnson@tauntons.ac.uk>
  * @copyright   2011 Tauntons College, UK
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ 
- 
+ */
+
 $string['pluginname'] = 'Appointments';
 $string['pluginnameplural'] = 'Appointments';
 $string['book'] = 'Book';
@@ -39,9 +38,8 @@ $string['notifysubject'] = 'Appointment to see {$a}';
 $string['notifytext'] = 'Hi {$a->student}
 {$a->teacher} has booked an appointment to see you on {$a->date} at {$a->time}.
 Please let {$a->teacher} know if you are unable to attend.';
-$string['notifysms'] = '{$a->teacher} has booked an appointment to see you on {$a->date} at {$a->time}.
-Please let them know if you are unable to attend.';
+$string['notifysms'] = '{$a->teacher} has booked an appointment to see you on {$a->date} at
+{$a->time}. Please let them know if you are unable to attend.';
 $string['remindsms'] = 'Don\'t forget your appointment with {$a->name} at {$a->time} today.';
 $string['pastdate'] = 'The time and date selected is in the past';
 $string['studentdoesntexist'] = 'The selected student doesn\'t exist';
-?>
