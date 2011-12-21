@@ -94,10 +94,12 @@ class block_course_appointments extends block_base {
                 $a = new stdClass;
                 $a->name = fullname($teacher);
                 $a->time = date('H:i', $appointment->timestart);
-                $sms = SMS::Loader($CFG);
-                if ($sms->format_number($student->phone2)) {
-                    $reminder = get_string('remindsms', 'block_course_appointments', $a);
-                    $sent = $sms->send_message(array($student->phone2), $reminder);
+                if (class_exists('SMS')) {
+                    $sms = SMS::Loader($CFG);
+                    if ($sms->format_number($student->phone2)) {
+                        $reminder = get_string('remindsms', 'block_course_appointments', $a);
+                        $sent = $sms->send_message(array($student->phone2), $reminder);
+                    }
                 }
             }
         }
@@ -378,14 +380,16 @@ class block_course_appointments extends block_base {
             $subject = get_string('notifysubject', 'block_course_appointments', $names->teacher);
             $message = get_string('notifytext', 'block_course_appointments', $names);
             $notified = email_to_user($this->student, $USER, $subject, $message);
-            $sms = SMS::Loader($CFG);
-            if ($sms->format_number($this->student->phone2)) {
-                $message = get_string('notifysms', 'block_course_appointments', $names);
-                $sent = $sms->send_message(array($this->student->phone2), $message);
-                // Create a list of users to whom the message failed to send
-                foreach ($sent->responses as $response) {
-                    if ($response->code == 1) {
-                        $notified = true;
+            if (class_exists('SMS')) {
+                $sms = SMS::Loader($CFG);
+                if ($sms->format_number($this->student->phone2)) {
+                    $message = get_string('notifysms', 'block_course_appointments', $names);
+                    $sent = $sms->send_message(array($this->student->phone2), $message);
+                    // Create a list of users to whom the message failed to send
+                    foreach ($sent->responses as $response) {
+                        if ($response->code == 1) {
+                            $notified = true;
+                        }
                     }
                 }
             }
