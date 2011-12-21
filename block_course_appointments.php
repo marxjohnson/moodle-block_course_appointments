@@ -156,14 +156,13 @@ class block_course_appointments extends block_base {
      */
     public function build_form($coursecontext) {
         global $CFG, $COURSE, $SESSION, $DB, $OUTPUT;
-        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
-        $studentassignments = get_users_from_role_on_context($studentrole, $coursecontext);
+        $cap = 'block/course_appointments:bookable';
+        $students = get_users_by_capability($coursecontext, $cap);
         $url = new moodle_url('/blocks/course_appointments/process.php');
         $studentlist = array();
 
-        foreach ($studentassignments as $studentassignment) {
-            $studentrecord = $DB->get_record('user', array('id' => $studentassignment->userid));
-            $studentlist[$studentrecord->id] = fullname($studentrecord);
+        foreach ($students as $student) {
+            $studentlist[$student->id] = fullname($student);
         }
 
         $hours = range(0, 23);
@@ -215,7 +214,7 @@ class block_course_appointments extends block_base {
         $form .= html_writer::empty_tag('input', $inputattrs);
         $form .= html_writer::start_tag('div', array('class' => "formrow"));
         $labelattrs = array('for' => "appointment_student");
-        $form .= html_writer::tag('label', $studentrole->name, $labelattrs);
+        $form .= html_writer::tag('label', get_string('students'), $labelattrs);
         $form .= html_writer::select($studentlist, 'appointment_student', $selected_student);
         $form .= html_writer::end_tag('div');
 
