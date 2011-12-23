@@ -134,16 +134,6 @@ class block_course_appointments extends block_base {
         }
 
         $this->content->footer = '';
-        $jsmodule = array(
-            'name'  =>  'block_course_appointments',
-            'fullpath'  =>  '/blocks/course_appointments/module.js',
-            'requires'  =>  array('base', 'node')
-        );
-
-        $this->page->requires->js_init_call('M.block_course_appointments.init',
-                                            array(),
-                                            false,
-                                            $jsmodule);
         return $this->content;
     }
 
