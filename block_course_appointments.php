@@ -127,7 +127,8 @@ class block_course_appointments extends block_base {
             }
 
             $url = new moodle_url('/blocks/course_appointments/process.php');
-            $mform = new course_appointments_form($url->out(), array('coursecontext' => $coursecontext));
+            $customdata = array('coursecontext' => $coursecontext);
+            $mform = new course_appointments_form($url->out(), $customdata);
             $form = $mform->display();
             $this->content->text .= $form;
         }

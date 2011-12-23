@@ -42,7 +42,6 @@ class course_appointments_form extends moodleform {
             $studentlist[$student->id] = fullname($student);
         }
 
-
         $mform->addElement('hidden', 'courseid', $coursecontext->instanceid);
 
         $mform->addElement('select',
