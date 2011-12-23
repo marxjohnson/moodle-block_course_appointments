@@ -31,19 +31,17 @@
  */
 
 require_once('../../config.php');
-require_login();
+@require_once($CFG->libdir.'/sms/smslib.php');
+require_once($CFG->dirroot.'/blocks/course_appointments/course_appointments_form.php');
+require_login($SITE);
 $courseid = required_param('courseid', PARAM_INT);
 $coursecontext = get_context_instance(CONTEXT_COURSE, $courseid);
 require_capability('block/course_appointments:book', $coursecontext);
 block_load_class('course_appointments');
 $block = new block_course_appointments();
-$SESSION->course_appointments = array();
+$form = new course_appointments_form(null, array('coursecontext' => $coursecontext));
 
-if (isset($_POST['appointment_submit'])) {
-    if ($errors = $block->validate_form()) {
-        $SESSION->course_appointments['errors'] = $errors;
-    } else {
-        $block->process_form();
-    }
+if ($data = $form->get_data()) {
+    $form->process($data);
 }
 redirect($CFG->wwwroot.'/course/view.php?id='.$courseid, '', 0);

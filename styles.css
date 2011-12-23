@@ -19,37 +19,40 @@ Copyright  2011 Tauntons College, UK
 Licence:  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-#block_courseappointments_calendarcontainer {
-    font-size: 9pt;
-    position: absolute;
+.block_course_appointments .mform fieldset {
+    margin: 0px;
+    padding: 0px;
 }
 
-.yui-skin-sam .yui-calcontainer .title {
-	background:url(../../lib/yui/assets/skins/sam/sprite.png) repeat-x 0 0;
+.block_course_appointments .mform fieldset > div {
+    margin: .2em 0em;
 }
 
-.yui-skin-sam .yui-calcontainer .calclose {
-	background:url(../../lib/yui/assets/skins/sam/sprite.png) no-repeat 0 -300px;
+.block_course_appointments .mform .fitem .fitemtitle {
+    width: 60%;
+    text-align: left;
 }
 
-/* NAVBAR LEFT ARROW */
-.yui-skin-sam .yui-calendar .calnavleft {
-	background:url(../../lib/yui/assets/skins/sam/sprite.png) no-repeat 0 -450px;
+.block_course_appointments .mform .fitem.required .felement,
+.block_course_appointments .mform .fitem .felement.fsubmit,
+.block_course_appointments .mform .fitem.required .fitemtitle {
+    text-align: left;
+    width: 100%;
+    margin-left: 0px;
 }
 
-/* NAVBAR RIGHT ARROW */
-.yui-skin-sam .yui-calendar .calnavright {
-	background:url(../../lib/yui/assets/skins/sam/sprite.png) no-repeat 0 -500px;
+.block_course_appointments .mform .fitem.required .fitemtitle {
+    float: none;
 }
 
-#block_courseappointments_appointmentdate {
-    width: 50%;
+.block_course_appointments .fdescription.required {
+    display: none;
 }
 
-.block_course_appointments button  {
-    padding:0px;
+.block_course_appointments fieldset > select + label + select {
+    width: 4em;
 }
 
-.block_course_appointments .errors {
-    color: #f33;
+.block_course_appointments fieldset > select + label + select + label + select {
+    width: auto;
 }
