@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-@require_once($CFG->libdir.'/sms/smslib.php');
+@include_once($CFG->libdir.'/sms/smslib.php');
 require_once($CFG->dirroot.'/blocks/course_appointments/course_appointments_form.php');
 /**
  *  Course Appointments block class

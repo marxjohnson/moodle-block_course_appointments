@@ -26,9 +26,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2011122100;
+$plugin->version = 2012013100;
 $plugin->cron = 3600;
 $plugin->requires = 2010112400;
 $plugin->component = 'block_course_appointments';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.0 (Build: 2011122100)';
+$plugin->release = '2.0.1 (Build: 2012013100)';

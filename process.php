@@ -31,7 +31,7 @@
  */
 
 require_once('../../config.php');
-@require_once($CFG->libdir.'/sms/smslib.php');
+@include_once($CFG->libdir.'/sms/smslib.php');
 require_once($CFG->dirroot.'/blocks/course_appointments/course_appointments_form.php');
 require_login($SITE);
 $courseid = required_param('courseid', PARAM_INT);
