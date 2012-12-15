@@ -24,6 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 @include_once($CFG->libdir.'/sms/smslib.php');
 require_once($CFG->dirroot.'/blocks/course_appointments/course_appointments_form.php');
 /**

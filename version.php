@@ -25,6 +25,7 @@
  * @copyright   2010 Tauntons College, UK
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->version = 2012013100;
 $plugin->cron = 3600;
