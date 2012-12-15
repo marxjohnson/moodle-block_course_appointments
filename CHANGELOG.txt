@@ -1,0 +1,3 @@
+New in version 2.1:
+* More secure code
+* Students' names are sorted alphabetically

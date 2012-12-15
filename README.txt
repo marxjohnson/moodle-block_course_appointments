@@ -6,6 +6,6 @@ student can be notified of the appointment, and it will be added to both users' 
 To install, place all files in /blocks/course_appointments and visit /admin/index.php in your
 browser.
 
-This block was written by Mark Johnson <mark.johnson@tauntons.ac.uk> and is Copyright Taunton's
-College, UK.
+This block was written by Mark Johnson <mark@barrenfrozenwasteland.com>. 
+It is Copyright Mark Johnson and Richard Taunton Sixth Form College.
 It is released Under the GNU General Public Licence http://www.gnu.org/licenses/gpl-3.0.html
