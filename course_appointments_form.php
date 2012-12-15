@@ -36,7 +36,7 @@ class course_appointments_form extends moodleform {
         $mform = $this->_form;
         $coursecontext = $this->_customdata['coursecontext'];
         $cap = 'block/course_appointments:bookable';
-        $students = get_users_by_capability($coursecontext, $cap);
+        $students = get_users_by_capability($coursecontext, $cap, '', 'lastname, firstname');
         $studentlist = array();
         foreach ($students as $student) {
             $studentlist[$student->id] = fullname($student);
