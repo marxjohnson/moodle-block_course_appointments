@@ -1,3 +1,7 @@
+New in version 2.1.1:
+Fixed bug causing cron errors
+Added 2.4 support
+
 New in version 2.1:
 * More secure code
 * Students' names are sorted alphabetically

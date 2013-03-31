@@ -27,9 +27,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2012121500;
+$plugin->version = 2013031300;
 $plugin->cron = 3600;
 $plugin->requires = 2011120500;
 $plugin->component = 'block_course_appointments';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.1';
+$plugin->release = '2.1.1';
