@@ -28,7 +28,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die();
 }
 require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->libdir.'/bennu/bennu.class.php');
+require_once($CFG->libdir.'/bennu/bennu.inc.php');
 
 class course_appointments_form extends moodleform {
 
